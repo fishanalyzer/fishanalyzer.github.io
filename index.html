@@ -103,7 +103,7 @@
         <div class="value" id="sellPrice">—</div>
       </div>
       <div class="stat">
-        <div style="font-size:13px;color:#9fb0d6">Money/hour (Fish Pond)</div>
+        <div style="font-size:13px;color:#9fb0d6">Income (Fish Pond)</div>
         <div class="value" id="moneyHour">—</div>
         <div class="meta" id="moneyMeta">⚠️ only half when offline!</div>
       </div>
@@ -295,15 +295,19 @@
       const artifactValid = (artifactStr.length !== 0);
 
       const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weightValid?weightNum:NaN,1+(artifactValid?artifactNum:0)/100);
-      const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
 
       if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
       else sellEl.textContent = '—';
 
-      const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
+      if (opt?.textContent.includes('Head') || opt?.textContent.includes('Meat')) {
+        sellEl.textContent = 'Only alive fish may be put into the fish pond';
+      } else {
+        const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
+        const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
 
-      if(lowerMph != null) moneyEl.textContent = msg;
-      else moneyEl.textContent = '—';
+        if(lowerMph != null) moneyEl.textContent = msg;
+        else moneyEl.textContent = '—';
+      }
     }
 
     function wire(){
