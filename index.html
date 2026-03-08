@@ -179,12 +179,22 @@
       if (!Number.isFinite(weight) || weight == 0) {
         return null;
       } else {
-        return `$${Math.round((weight-0.05) * fishValue * starsValue * mutationValue)}—$${Math.round((weight+0.049) * fishValue * starsValue * mutationValue)}`;
+        return { lower: Math.round((weight-0.05) * fishValue * starsValue * mutationValue), upper: Math.round((weight+0.049) * fishValue * starsValue * mutationValue) };
       }
     }
 
-    function computeMoneyPerHour(fishValue,starsValue,mutationValue,weight){
-      return null;
+    function computeBoundedMoneyPerHour(lower,upper,cycleTime,mutated,weight){
+      if (!Number.isFinite(weight) || weight == 0) {
+        return null;
+      } else {
+        const lowerMph = computeMoneyPerHour(lower,cycleTime,mutated);
+        const upperMph = computeMoneyPerHour(upper,cycleTime,mutated);
+        return { lowerbound: lowerMph, upperbound: upperMph };
+      }
+    }
+
+    function computeMoneyPerHour(price,cycleTime,mutated) {
+      return Math.round(Math.ceil(price * (mutated ? 0.01 : 0.02)) / cycleTime * 60);
     }
 
     function update(){
@@ -198,12 +208,13 @@
       const opt = fishSel.selectedOptions[0];
       const category = opt?.dataset?.category;
 
+      const parsed = Number(mutationSel.value);
+      const mutated = Number.isFinite(parsed);
+
       const fishValue = Number(opt?.value);
       const fishCycleTime = rarityCycleTimes[category];
-      console.log(category, fishValue);
-      console.log(fishCycleTime);
       const starsValue = Number(starsSel.value);
-      const mutationValue = Number(mutationSel.value);
+      const mutationValue = mutated ? parsed : 1;
       const weightStr = weightInput.value.trim();
       const weightNum = Number(weightStr);
 
@@ -230,13 +241,13 @@
         document.getElementById('weightHint').textContent = '';
       }
 
-      const sell = computeSellPrice(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
-      const money = computeMoneyPerHour(sell,weightValid?weightNum:NaN);
+      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
+      const { lowerMph, upperMph} = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
 
-      if(sell != null) sellEl.textContent = sell;
+      if(lower != null) sellEl.textContent = `$${lower}—$${upper}`;
       else sellEl.textContent = '—';
 
-      if(typeof money === 'number' && Number.isFinite(money)) moneyEl.textContent = String(money);
+      if(lowerMph != null) moneyEl.textContent = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
       else moneyEl.textContent = '—';
     }
 
