@@ -1,22 +1,22 @@
 {
   "Mythical": {
-    "Dragonfish Head": 140,
-    "Dragonfish Meat": 70,
-    "King Anglerfish Head": 90,
-    "King Anglerfish Meat": 45,
-    "Pelican Eel Head": 150,
-    "Pelican Eel Meat": 75
+    "☠️ Dragonfish Head": 140,
+    "☠️  Dragonfish Meat": 70,
+    "☠️ King Anglerfish Head": 90,
+    "☠️ King Anglerfish Meat": 45,
+    "☠️ Pelican Eel Head": 150,
+    "☠️ Pelican Eel Meat": 75
   },
   "Legendary": {
     "Ancient Shark": 50,
     "Bigmouthfish": 76,
     "Bluefin Tuna": 36,
     "Eyefish": 160,
-    "Mosasaurus Head": 90,
-    "Mosasaurus Meat": 45,
+    "☠️ Mosasaurus Head": 90,
+    "☠️ Mosasaurus Meat": 45,
     "Sacabambaspis": 150,
-    "Whale Head": 80,
-    "Whale Meat": 40
+    "☠️ Whale Head": 80,
+    "☠️ Whale Meat": 40
   },
   "Epic": {
     "Barracuda": 20,
