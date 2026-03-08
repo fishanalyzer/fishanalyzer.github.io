@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Fish Pond Calculator</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0f172a;color:#e6eef8}
+    .card{width:720px;padding:28px;border-radius:12px;background:linear-gradient(180deg,#0b1220, #071029);box-shadow:0 6px 30px rgba(2,6,23,.6)}
+    h1{margin:0 0 18px;font-size:20px}
+    .row{display:flex;gap:12px;margin-bottom:12px}
+    label{font-size:12px;color:#9fb0d6}
+    select,input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:inherit;font-size:14px}
+    .col{flex:1;min-width:0}
+    .results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+    .stat{padding:12px;border-radius:10px;background:rgba(255,255,255,.02);text-align:center}
+    .value{font-size:18px;margin-top:8px}
+    .meta{font-size:12px;color:#87a0c6;margin-top:8px}
+    .invalid{border-color:#ff6b6b}
+    .hint{font-size:12px;color:#87a0c6;margin-top:8px}
+    footer{font-size:12px;color:#6f8ab0;margin-top:14px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Fish Pond Calculator</h1>
+    <div class="row">
+      <div class="col">
+        <label for="fishSelect">Fish</label>
+        <select id="fishSelect"><option>Loading...</option></select>
+      </div>
+      <div class="col">
+        <label for="starsSelect">Stars</label>
+        <select id="starsSelect"><option>Loading...</option></select>
+      </div>
+      <div class="col">
+        <label for="mutationSelect">Mutation</label>
+        <select id="mutationSelect"><option>Loading...</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div style="flex:0 0 220px">
+        <label for="weightInput">Weight (kg)</label>
+        <input id="weightInput" inputmode="decimal" placeholder="e.g. 2.5">
+        <div class="hint" id="weightHint">Use a dot as decimal separator.</div>
+      </div>
+      <div style="flex:1;display:flex;align-items:flex-end">
+        <div style="font-size:12px;color:#9fb0d6">Values shown below are the numeric values loaded from the JSON files and the parsed weight.</div>
+      </div>
+    </div>
+    <div class="results">
+      <div class="stat">
+        <div style="font-size:13px;color:#9fb0d6">Sell price</div>
+        <div class="value" id="sellPrice">—</div>
+        <div class="meta" id="sellMeta"></div>
+      </div>
+      <div class="stat">
+        <div style="font-size:13px;color:#9fb0d6">Fish Pond Money/h</div>
+        <div class="value" id="moneyHour">—</div>
+        <div class="meta" id="moneyMeta"></div>
+      </div>
+    </div>
+    <footer>Place fish.json, stars.json, mutation.json next to this file. Supported JSON formats described below.</footer>
+  </div>
+  <script>
+    const files = [
+      {id:'fishSelect', file:'fish.json'},
+      {id:'starsSelect', file:'stars.json'},
+      {id:'mutationSelect', file:'mutation.json'}
+    ];
+
+    function parseOptionsJson(data){
+      if(Array.isArray(data)){
+        return data.map(item=>{
+          if(typeof item === 'object' && item !== null){
+            const name = 'name' in item ? String(item.name) : String(item[0] ?? item.label ?? '');
+            const value = Number(item.value ?? item[1] ?? 0);
+            return {name,value};
+          }
+          return {name:String(item),value:0};
+        });
+      }
+      if(typeof data === 'object' && data !== null){
+        return Object.keys(data).map(k=>({name:k,value:Number(data[k])}));
+      }
+      return [];
+    }
+
+    async function loadAll(){
+      await Promise.all(files.map(async f=>{
+        try{
+          const res = await fetch(f.file);
+          if(!res.ok) throw new Error('no');
+          const json = await res.json();
+          const opts = parseOptionsJson(json);
+          const sel = document.getElementById(f.id);
+          sel.innerHTML = '';
+          opts.forEach(o=>{
+            const opt = document.createElement('option');
+            opt.textContent = o.name;
+            opt.value = String(o.value);
+            sel.appendChild(opt);
+          });
+        }catch(e){
+          const sel = document.getElementById(f.id);
+          sel.innerHTML = '<option value="0">(missing '+f.file+')</option>';
+        }
+      }));
+      wire();
+      update();
+    }
+
+    function sanitizeWeight(s){
+      s = s.replace(/[^0-9.]/g,'');
+      const parts = s.split('.');
+      if(parts.length>2) s = parts[0]+'.'+parts.slice(1).join('');
+      if(s.startsWith('.')) s = '0'+s;
+      return s;
+    }
+
+    function getNumber(element){
+      const v = Number(element.value);
+      return Number.isFinite(v)?v:0;
+    }
+
+    function computeSellPrice(fishValue,starsValue,mutationValue,weight){
+      return null;
+    }
+
+    function computeMoneyPerHour(fishValue,starsValue,mutationValue,weight){
+      return null;
+    }
+
+    function update(){
+      const fishSel = document.getElementById('fishSelect');
+      const starsSel = document.getElementById('starsSelect');
+      const mutationSel = document.getElementById('mutationSelect');
+      const weightInput = document.getElementById('weightInput');
+      const sellEl = document.getElementById('sellPrice');
+      const moneyEl = document.getElementById('moneyHour');
+      const sellMeta = document.getElementById('sellMeta');
+      const moneyMeta = document.getElementById('moneyMeta');
+
+      const fishValue = Number(fishSel.value);
+      const starsValue = Number(starsSel.value);
+      const mutationValue = Number(mutationSel.value);
+      const weightStr = weightInput.value.trim();
+      const weightNum = Number(weightStr);
+
+      const weightValid = weightStr.length>0 && /^\d+(?:\.\d+)?$/.test(weightStr);
+      if(!weightValid && weightStr.length>0){
+        weightInput.classList.add('invalid');
+        document.getElementById('weightHint').textContent = 'Invalid weight — use digits and a single dot.';
+      } else {
+        weightInput.classList.remove('invalid');
+        document.getElementById('weightHint').textContent = 'Use a dot as decimal separator.';
+      }
+
+      const sell = computeSellPrice(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
+      const money = computeMoneyPerHour(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
+
+      if(typeof sell === 'number' && Number.isFinite(sell)) sellEl.textContent = String(sell);
+      else sellEl.textContent = '—';
+
+      if(typeof money === 'number' && Number.isFinite(money)) moneyEl.textContent = String(money);
+      else moneyEl.textContent = '—';
+
+      sellMeta.textContent = `fish=${fishValue} stars=${starsValue} mutation=${mutationValue} weight=${weightValid?weightNum:'?'} `;
+      moneyMeta.textContent = `fish=${fishValue} stars=${starsValue} mutation=${mutationValue} weight=${weightValid?weightNum:'?'} `;
+    }
+
+    function wire(){
+      document.getElementById('fishSelect').addEventListener('change',update);
+      document.getElementById('starsSelect').addEventListener('change',update);
+      document.getElementById('mutationSelect').addEventListener('change',update);
+      const wi = document.getElementById('weightInput');
+      wi.addEventListener('input',e=>{
+        const cleaned = sanitizeWeight(e.target.value);
+        if(cleaned !== e.target.value) e.target.value = cleaned;
+        update();
+      });
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>
