@@ -183,13 +183,13 @@
       }
     }
 
-    function computeBoundedMoneyPerHour(lower,upper,cycleTime,mutated,weight){
+    function computeBoundedMoneyPerHour(lower, upper, cycleTime, mutated, weight) {
       if (!Number.isFinite(weight) || weight == 0) {
-        return { lowerbound: null, upperbound: null};
+        return { lowerMph: null, upperMph: null };
       } else {
-        const lowerMph = computeMoneyPerHour(lower,cycleTime,mutated);
-        const upperMph = computeMoneyPerHour(upper,cycleTime,mutated);
-        return { lowerbound: lowerMph, upperbound: upperMph };
+        const lowerMph = computeMoneyPerHour(lower, cycleTime, mutated);
+        const upperMph = computeMoneyPerHour(upper, cycleTime, mutated);
+        return { lowerMph, upperMph };
       }
     }
 
