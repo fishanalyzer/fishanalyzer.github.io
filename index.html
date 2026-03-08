@@ -300,7 +300,7 @@
       else sellEl.textContent = '—';
 
       if (opt?.textContent.includes('Head') || opt?.textContent.includes('Meat')) {
-        sellEl.textContent = 'Only alive fish may be put into the fish pond';
+        moneyEl.textContent = 'Only alive fish may be put into the fish pond';
       } else {
         const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
         const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
