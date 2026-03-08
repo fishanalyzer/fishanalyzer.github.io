@@ -50,12 +50,10 @@
       <div class="stat">
         <div style="font-size:13px;color:#9fb0d6">Estimated Sell Price (at kraken)</div>
         <div class="value" id="sellPrice">—</div>
-        <div class="meta" id="sellMeta"></div>
       </div>
       <div class="stat">
         <div style="font-size:13px;color:#9fb0d6">Fish Pond Money/h</div>
         <div class="value" id="moneyHour">—</div>
-        <div class="meta" id="moneyMeta"></div>
       </div>
     </div>
   </div>
@@ -187,8 +185,6 @@
       const weightInput = document.getElementById('weightInput');
       const sellEl = document.getElementById('sellPrice');
       const moneyEl = document.getElementById('moneyHour');
-      const sellMeta = document.getElementById('sellMeta');
-      const moneyMeta = document.getElementById('moneyMeta');
 
       const fishValue = Number(fishSel.value);
       const starsValue = Number(starsSel.value);
@@ -220,17 +216,13 @@
       }
 
       const sell = computeSellPrice(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
-      console.log(sell);
       const money = computeMoneyPerHour(sell,weightValid?weightNum:NaN);
 
-      if(typeof sell === 'number' && Number.isFinite(sell)) sellEl.textContent = String(sell);
+      if(sell != null) sellEl.textContent = sell;
       else sellEl.textContent = '—';
 
       if(typeof money === 'number' && Number.isFinite(money)) moneyEl.textContent = String(money);
       else moneyEl.textContent = '—';
-
-      sellMeta.textContent = `fish=${fishValue} stars=${starsValue} mutation=${mutationValue} weight=${weightValid?weightNum:'?'} `;
-      moneyMeta.textContent = `fish=${fishValue} stars=${starsValue} mutation=${mutationValue} weight=${weightValid?weightNum:'?'} `;
     }
 
     function wire(){
