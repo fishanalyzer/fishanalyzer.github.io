@@ -5,21 +5,61 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Fish Pond Calculator</title>
   <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    body{display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0f172a;color:#e6eef8}
-    .card{width:720px;padding:28px;border-radius:12px;background:linear-gradient(180deg,#0b1220, #071029);box-shadow:0 6px 30px rgba(2,6,23,.6)}
-    h1{margin:0 0 18px;font-size:20px}
-    .row{display:flex;gap:12px;margin-bottom:12px}
-    label{font-size:12px;color:#9fb0d6}
-    select,input{width:100%;padding:10px;border-radius:8px;border:1px solid #1c2434;background:#0f172A;color:inherit;font-size:14px}
-    .col{flex:1;min-width:0}
-    .results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-    .stat{padding:12px;border-radius:10px;background:rgba(255,255,255,.02);text-align:center}
-    .value{font-size:18px;margin-top:8px}
-    .meta{font-size:12px;color:#87a0c6;margin-top:8px}
+    *,*::before,*::after{box-sizing:border-box}
+    :root{
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      font-size:clamp(14px,1.2vw,16px);
+      --card-max-width:980px;
+      --gutter:clamp(.5rem,1.2vw,1.75rem);
+      --pad:clamp(1rem,2.2vw,1.75rem);
+      --radius:12px;
+    }
+    @media (min-width:1400px){
+      :root{font-size:15px}
+    }
+    html,body{height:100%}
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100dvh;
+      margin:0;
+      background:#0f172a;
+      color:#e6eef8;
+      padding:clamp(.5rem,1.5vw,1.25rem);
+    }
+    .card{
+      width:min(92vw,var(--card-max-width));
+      padding:var(--pad);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg,#0b1220,#071029);
+      box-shadow:0 6px 30px rgba(2,6,23,.6);
+      display:block;
+      container-type:inline-size;
+    }
+    h1{margin:0 0 .9rem;font-size:1.25rem}
+    .row{display:flex;gap:var(--gutter);margin-bottom:clamp(.5rem,1.2vw,.9rem);align-items:flex-start}
+    label{font-size:.85rem;color:#9fb0d6}
+    select,input{width:100%;padding:clamp(.5rem,1.2vw,.75rem);border-radius:8px;border:1px solid #1c2434;background:#0f172a;color:inherit;font-size:1rem;min-height:2.4rem}
+    .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:.35rem}
+    .results{display:grid;gap:var(--gutter);margin-top:clamp(.75rem,1.8vw,1rem);grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .stat{padding:clamp(.75rem,1.6vw,1rem);border-radius:10px;background:rgba(255,255,255,.02);text-align:center}
+    .value{font-size:1.125rem;margin-top:.5rem}
+    .meta{font-size:.85rem;color:#87a0c6;margin-top:.5rem}
     .invalid{border-color:#ff6b6b}
-    .hint{font-size:12px;color:#87a0c6;margin-top:8px}
-    footer{font-size:12px;color:#6f8ab0;margin-top:14px;text-align:center}
+    .hint{font-size:.85rem;color:#87a0c6;margin:0}
+    footer{font-size:.85rem;color:#6f8ab0;margin-top:1rem;text-align:center}
+
+    @container (max-width:520px){
+      .row{flex-direction:column;align-items:stretch}
+      label{width:100%}
+      .results{grid-template-columns:1fr}
+      h1{font-size:1.1rem}
+    }
+    @media (max-width:420px){
+      :root{font-size:14px}
+      .card{padding:clamp(.75rem,3vw,1rem)}
+    }
   </style>
 </head>
 <body>
@@ -40,10 +80,21 @@
       </div>
     </div>
     <div class="row">
-      <div style="flex:0 0 220px">
+      <div class="col">
         <label for="weightInput">Weight (kg)</label>
         <input id="weightInput" inputmode="decimal" placeholder="e.g. 2.5">
         <div class="hint" id="weightHint"></div>
+      </div>
+
+      <div class="col">
+        <label for="raceSelect">Active Race*</label>
+        <select id="raceSelect"><option>Loading...</option></select>
+      </div>
+
+      <div class="col">
+        <label for="cashMultiplier">UNIMPLEMENTED Active Artifacts Cash Bonus (%)*</label>
+        <input id="cashMultiplier" inputmode="decimal" placeholder="e.g. 12.8">
+        <div class="hint" id="artifacthint">Example: The King's Fortune + 2 Coins with Cash VII = 10 + 1.4 + 1.4 = 12.8 (%) </div>
       </div>
     </div>
     <div class="results">
@@ -52,19 +103,24 @@
         <div class="value" id="sellPrice">—</div>
       </div>
       <div class="stat">
-        <div style="font-size:13px;color:#9fb0d6">Fish Pond Money/h</div>
+        <div style="font-size:13px;color:#9fb0d6">Money/hour (Fish Pond)</div>
         <div class="value" id="moneyHour">—</div>
       </div>
     </div>
+    <footer role="contentinfo" class="card-footer">
+      <small>* Race & Artifacts only matter the moment the roe is generated, it won't affect the roe after.</small>
+    </footer>
   </div>
   <script>
     const files = [
       {id:'fishSelect', file:'fish.json'},
       {id:'starsSelect', file:'stars.json'},
-      {id:'mutationSelect', file:'mutation.json'}
+      {id:'mutationSelect', file:'mutation.json'},
+      {id:'raceSelect', file:'races.json'}
     ];
 
     const rarityColors = {
+      Mythical: 'red',
       Legendary: 'orange',
       Epic: 'purple',
       Rare: 'blue',
@@ -133,7 +189,9 @@
             opt.value = String(o.value);
             if (o.category) {
               opt.style.color = rarityColors[o.category] || '';
-              opt.dataset.category = o.category;
+              if (f.id === 'fishSelect') {
+                opt.dataset.category = o.category;
+              }
             }
             sel.appendChild(opt);
           });
@@ -175,11 +233,11 @@
       return Number.isFinite(v)?v:0;
     }
 
-    function computeSellPrice(fishValue,starsValue,mutationValue,weight){
+    function computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weight){
       if (!Number.isFinite(weight) || weight == 0) {
         return { lower: null, upper: null};
       } else {
-        return { lower: Math.round((weight-0.05) * fishValue * starsValue * mutationValue), upper: Math.round((weight+0.049) * fishValue * starsValue * mutationValue) };
+        return { lower: (weight-0.05) * fishValue * starsValue * mutationValue * raceValue, upper: (weight+0.049) * fishValue * starsValue * mutationValue * raceValue };
       }
     }
 
@@ -204,6 +262,7 @@
       const weightInput = document.getElementById('weightInput');
       const sellEl = document.getElementById('sellPrice');
       const moneyEl = document.getElementById('moneyHour');
+      const raceSel = document.getElementById('raceSelect');
 
       const opt = fishSel.selectedOptions[0];
       const category = opt?.dataset?.category;
@@ -217,6 +276,8 @@
       const mutationValue = mutated ? parsed : 1;
       const weightStr = weightInput.value.trim();
       const weightNum = Number(weightStr);
+
+      const raceValue = Number(raceSel.value);
 
       const weightValid = (function(ws){
         if(ws.length === 0) return false;
@@ -241,10 +302,10 @@
         document.getElementById('weightHint').textContent = '';
       }
 
-      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
+      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weightValid?weightNum:NaN);
       const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
 
-      if(lower != null) sellEl.textContent = `$${lower}—$${upper}`;
+      if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
       else sellEl.textContent = '—';
 
       const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
@@ -257,6 +318,7 @@
       document.getElementById('fishSelect').addEventListener('change',update);
       document.getElementById('starsSelect').addEventListener('change',update);
       document.getElementById('mutationSelect').addEventListener('change',update);
+      document.getElementById('raceSelect').addEventListener('change',update);
       const wi = document.getElementById('weightInput');
       wi.addEventListener('input',e=>{
         const cleaned = sanitizeWeight(e.target.value);
