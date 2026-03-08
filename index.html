@@ -83,7 +83,6 @@
       <div class="col">
         <label for="weightInput">Weight (kg)</label>
         <input id="weightInput" inputmode="decimal" placeholder="e.g. 2.5">
-        <div class="hint" id="weightHint"></div>
       </div>
 
       <div class="col">
@@ -94,7 +93,7 @@
       <div class="col">
         <label for="cashMultiplier">Active Artifacts Cash Bonus (%)*</label>
         <input id="cashMultiplier" inputmode="decimal" placeholder="e.g. 12.8">
-        <div class="hint" id="artifacthint">Example: The King's Fortune + 2 Coins with Cash VII = 10 + 1.4 + 1.4 = 12.8 (%) </div>
+        <div class="hint" id="artifacthint">Example: The King's Fortune + 2 Coins with Cash VII = 10 + 1.4 + 1.4 = 12.8 (%) (leave empty to ignore) </div>
       </div>
     </div>
     <div class="results">
@@ -105,7 +104,7 @@
       <div class="stat">
         <div style="font-size:13px;color:#9fb0d6">Income (Fish Pond)</div>
         <div class="value" id="moneyHour">—</div>
-        <div class="meta" id="moneyMeta">⚠️ only half when offline!</div>
+        <div class="meta" id="moneyMeta"></div>
       </div>
     </div>
     <footer role="contentinfo" class="card-footer">
@@ -271,6 +270,7 @@
       const weightInput = document.getElementById('weightInput');
       const sellEl = document.getElementById('sellPrice');
       const moneyEl = document.getElementById('moneyHour');
+      const moneyMeta = document.getElementById('moneyMeta');
       const raceSel = document.getElementById('raceSelect');
       const artifactInput = document.getElementById('cashMultiplier');
 
@@ -299,14 +299,20 @@
       if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
       else sellEl.textContent = '—';
 
-      if (opt?.textContent.includes('☠️')) {
+      if (opt?.textContent.includes('Head') || opt?.textContent.includes('Meat')) {
         moneyEl.textContent = 'Only alive fish may be put into the fish pond';
+        moneyMeta.textContent = '';
       } else {
         const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
         const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
 
-        if(lowerMph != null) moneyEl.textContent = msg;
-        else moneyEl.textContent = '—';
+        if (lowerMph != null) {
+          moneyEl.textContent = msg
+          moneyMeta.textContent = '⚠️ only half when offline!';
+        } else {
+          moneyEl.textContent = '—';
+          moneyMeta.textContent = '';
+        }
       }
     }
 
