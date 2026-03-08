@@ -1,0 +1,18 @@
+{
+  "Common": {
+    "Other": 1
+  },
+  "Mythical": {
+    "Kraken": 1.15,
+    "Sea Angel": 1.15
+  },
+  "Legendary": {
+    "Shark": 1.1
+  },
+  "Epic": {
+    "Anglerfish": 1.08
+  },
+  "Rare": {
+    "Spirit": 1.08
+  }
+}
