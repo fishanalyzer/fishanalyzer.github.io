@@ -185,10 +185,13 @@
 
     function computeBoundedMoneyPerHour(lower,upper,cycleTime,mutated,weight){
       if (!Number.isFinite(weight) || weight == 0) {
+        console.log("returning");
         return { lower: null, upper: null};
       } else {
+        console.log("calculating lower and upper m/h bounds");
         const lowerMph = computeMoneyPerHour(lower,cycleTime,mutated);
         const upperMph = computeMoneyPerHour(upper,cycleTime,mutated);
+        console.log(lowerMph, upperMph);
         return { lowerbound: lowerMph, upperbound: upperMph };
       }
     }
