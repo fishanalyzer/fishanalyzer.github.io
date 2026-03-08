@@ -92,7 +92,7 @@
       </div>
 
       <div class="col">
-        <label for="cashMultiplier">UNIMPLEMENTED Active Artifacts Cash Bonus (%)*</label>
+        <label for="cashMultiplier">Active Artifacts Cash Bonus (%)*</label>
         <input id="cashMultiplier" inputmode="decimal" placeholder="e.g. 12.8">
         <div class="hint" id="artifacthint">Example: The King's Fortune + 2 Coins with Cash VII = 10 + 1.4 + 1.4 = 12.8 (%) </div>
       </div>
@@ -153,7 +153,6 @@
 
       if (typeof data === 'object' && data !== null) {
         const topKeys = Object.keys(data);
-        // detect grouped-by-rarity: top-level keys map to objects of fish
         const isGrouped = topKeys.length > 0 && topKeys.every(k => typeof data[k] === 'object' && data[k] !== null);
 
         if (isGrouped) {
@@ -166,7 +165,6 @@
           return out;
         }
 
-        // flat map (name -> value)
         topKeys.forEach(k => out.push({ name: k, value: Number(data[k]) }));
         return out;
       }
@@ -204,27 +202,37 @@
       update();
     }
 
-    function sanitizeWeight(s){
+    function sanitizeInput(s, oneDigit = true) {
       s = String(s);
       let out = '';
-      for(let i=0;i<s.length;i++){
+      for (let i = 0; i < s.length; i++) {
         const ch = s[i];
-        if((ch >= '0' && ch <= '9') || ch === '.') out += ch;
+        if ((ch >= '0' && ch <= '9') || ch === '.') out += ch;
       }
+
       const firstDot = out.indexOf('.');
-      if(firstDot === -1){
-        if(out === '') return '';
+      if (firstDot === -1) {
+        if (out === '') return '';
         return out;
       }
+
       let intPart = '';
-      for(let i=0;i<firstDot;i++){
-        if(out[i] !== '.') intPart += out[i];
+      for (let i = 0; i < firstDot; i++) {
+        if (out[i] !== '.') intPart += out[i];
       }
+
       let frac = '';
-      for(let i=firstDot+1;i<out.length && frac.length < 1;i++){
-        if(out[i] !== '.') frac += out[i];
+      if (oneDigit) {
+        for (let i = firstDot + 1; i < out.length && frac.length < 1; i++) {
+          if (out[i] !== '.') frac += out[i];
+        }
+      } else {
+        for (let i = firstDot + 1; i < out.length; i++) {
+          if (out[i] !== '.') frac += out[i];
+        }
       }
-      if(intPart === '') intPart = '0';
+
+      if (intPart === '') intPart = '0';
       return intPart + '.' + frac;
     }
 
@@ -233,11 +241,11 @@
       return Number.isFinite(v)?v:0;
     }
 
-    function computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weight){
+    function computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weight,artifact){
       if (!Number.isFinite(weight) || weight == 0) {
         return { lower: null, upper: null};
       } else {
-        return { lower: (weight-0.05) * fishValue * starsValue * mutationValue * raceValue, upper: (weight+0.049) * fishValue * starsValue * mutationValue * raceValue };
+        return { lower: (weight-0.05) * fishValue * starsValue * mutationValue * raceValue, upper: (weight+0.049) * fishValue * starsValue * mutationValue * raceValue * artifact };
       }
     }
 
@@ -263,6 +271,7 @@
       const sellEl = document.getElementById('sellPrice');
       const moneyEl = document.getElementById('moneyHour');
       const raceSel = document.getElementById('raceSelect');
+      const artifactInput = document.getElementById('cashMultiplier');
 
       const opt = fishSel.selectedOptions[0];
       const category = opt?.dataset?.category;
@@ -276,33 +285,15 @@
       const mutationValue = mutated ? parsed : 1;
       const weightStr = weightInput.value.trim();
       const weightNum = Number(weightStr);
+      const weightValid = (weightStr.length !== 0 && weightNum !== 0);
 
       const raceValue = Number(raceSel.value);
 
-      const weightValid = (function(ws){
-        if(ws.length === 0) return false;
-        const firstDot = ws.indexOf('.');
-        if(firstDot === -1){
-          for(let i=0;i<ws.length;i++){ const c = ws.charCodeAt(i); if(c < 48 || c > 57) return false; }
-          return true;
-        }
-        if(firstDot !== ws.lastIndexOf('.')) return false;
-        if(firstDot === 0) return false;
-        if(ws.length - firstDot - 1 > 1) return false;
-        for(let i=0;i<firstDot;i++){ const c = ws.charCodeAt(i); if(c < 48 || c > 57) return false; }
-        for(let i=firstDot+1;i<ws.length;i++){ const c = ws.charCodeAt(i); if(c < 48 || c > 57) return false; }
-        return true;
-      })(weightStr);
+      const artifactStr = artifactInput.value.trim();
+      const artifactNum = Number(artifactStr);
+      const artifactValid = (artifactStr.length !== 0);
 
-      if(!weightValid && weightStr.length>0){
-        weightInput.classList.add('invalid');
-        document.getElementById('weightHint').textContent = 'Invalid weight — use digits and a single dot.';
-      } else {
-        weightInput.classList.remove('invalid');
-        document.getElementById('weightHint').textContent = '';
-      }
-
-      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weightValid?weightNum:NaN);
+      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weightValid?weightNum:NaN,1+(artifactValid?artifactNum:0));
       const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
 
       if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
@@ -319,11 +310,15 @@
       document.getElementById('starsSelect').addEventListener('change',update);
       document.getElementById('mutationSelect').addEventListener('change',update);
       document.getElementById('raceSelect').addEventListener('change',update);
-      const wi = document.getElementById('weightInput');
-      wi.addEventListener('input',e=>{
-        const cleaned = sanitizeWeight(e.target.value);
+      document.getElementById('weightInput').addEventListener('input',e=>{
+        const cleaned = sanitizeInput(e.target.value);
         if(cleaned !== e.target.value) e.target.value = cleaned;
-        update();
+        else update();
+      });
+      document.getElementById('cashMultiplier').addEventListener('input',e=>{
+        const cleaned = sanitizeInput(e.target.value, false);
+        if(cleaned !== e.target.value) e.target.value = cleaned;
+        else update();
       });
     }
 
