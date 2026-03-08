@@ -72,6 +72,14 @@
       Common: 'grey'
     };
 
+    const rarityCycleTimes = {
+      Legendary: 10,
+      Epic: 7,
+      Rare: 4,
+      Uncommon: 2,
+      Common: 1
+    };
+
     function parseOptionsJson(data){
       const out = [];
       if (Array.isArray(data)) {
@@ -125,6 +133,7 @@
             opt.value = String(o.value);
             if (o.category) {
               opt.style.color = rarityColors[o.category] || '';
+              opt.dataset.category = o.category;
             }
             sel.appendChild(opt);
           });
@@ -167,7 +176,7 @@
     }
 
     function computeSellPrice(fishValue,starsValue,mutationValue,weight){
-      if (!Number.isFinite(weight)) {
+      if (!Number.isFinite(weight) || weight == 0) {
         return null;
       } else {
         return `$${Math.round((weight-0.05) * fishValue * starsValue * mutationValue)}—$${Math.round((weight+0.049) * fishValue * starsValue * mutationValue)}`;
@@ -187,6 +196,8 @@
       const moneyEl = document.getElementById('moneyHour');
 
       const fishValue = Number(fishSel.value);
+      const fishCycleTime = rarityCycleTimes[fishSel.dataset.category];
+      console.log(fishCycleTime);
       const starsValue = Number(starsSel.value);
       const mutationValue = Number(mutationSel.value);
       const weightStr = weightInput.value.trim();
