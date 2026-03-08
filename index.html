@@ -43,10 +43,6 @@
       <div style="flex:0 0 220px">
         <label for="weightInput">Weight (kg)</label>
         <input id="weightInput" inputmode="decimal" placeholder="e.g. 2.5">
-        <div class="hint" id="weightHint">Use a dot as decimal separator.</div>
-      </div>
-      <div style="flex:1;display:flex;align-items:flex-end">
-        <div style="font-size:12px;color:#9fb0d6">Values shown below are the numeric values loaded from the JSON files and the parsed weight.</div>
       </div>
     </div>
     <div class="results">
@@ -61,7 +57,6 @@
         <div class="meta" id="moneyMeta"></div>
       </div>
     </div>
-    <footer>Place fish.json, stars.json, mutation.json next to this file. Supported JSON formats described below.</footer>
   </div>
   <script>
     const files = [
@@ -70,21 +65,50 @@
       {id:'mutationSelect', file:'mutation.json'}
     ];
 
+    const rarityColors = {
+      Legendary: 'orange',
+      Epic: 'purple',
+      Rare: 'blue',
+      Uncommon: 'green',
+      Common: 'grey'
+    };
+
     function parseOptionsJson(data){
-      if(Array.isArray(data)){
-        return data.map(item=>{
-          if(typeof item === 'object' && item !== null){
+      const out = [];
+      if (Array.isArray(data)) {
+        data.forEach(item => {
+          if (item && typeof item === 'object') {
             const name = 'name' in item ? String(item.name) : String(item[0] ?? item.label ?? '');
             const value = Number(item.value ?? item[1] ?? 0);
-            return {name,value};
+            out.push({ name, value });
+          } else {
+            out.push({ name: String(item), value: 0 });
           }
-          return {name:String(item),value:0};
         });
+        return out;
       }
-      if(typeof data === 'object' && data !== null){
-        return Object.keys(data).map(k=>({name:k,value:Number(data[k])}));
+
+      if (typeof data === 'object' && data !== null) {
+        const topKeys = Object.keys(data);
+        // detect grouped-by-rarity: top-level keys map to objects of fish
+        const isGrouped = topKeys.length > 0 && topKeys.every(k => typeof data[k] === 'object' && data[k] !== null);
+
+        if (isGrouped) {
+          topKeys.forEach(category => {
+            const group = data[category];
+            Object.keys(group).forEach(fishName => {
+              out.push({ name: fishName, value: Number(group[fishName]), category });
+            });
+          });
+          return out;
+        }
+
+        // flat map (name -> value)
+        topKeys.forEach(k => out.push({ name: k, value: Number(data[k]) }));
+        return out;
       }
-      return [];
+
+      return out;
     }
 
     async function loadAll(){
@@ -96,10 +120,13 @@
           const opts = parseOptionsJson(json);
           const sel = document.getElementById(f.id);
           sel.innerHTML = '';
-          opts.forEach(o=>{
+          opts.forEach(o => {
             const opt = document.createElement('option');
             opt.textContent = o.name;
             opt.value = String(o.value);
+            if (o.category) {
+              opt.style.color = rarityColors[o.category] || '';
+            }
             sel.appendChild(opt);
           });
         }catch(e){
