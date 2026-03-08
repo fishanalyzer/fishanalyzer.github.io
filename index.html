@@ -293,7 +293,7 @@
       const artifactNum = Number(artifactStr);
       const artifactValid = (artifactStr.length !== 0);
 
-      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weightValid?weightNum:NaN,1+(artifactValid?artifactNum:0));
+      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weightValid?weightNum:NaN,1+(artifactValid?artifactNum:0)/100);
       const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
 
       if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
