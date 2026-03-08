@@ -208,17 +208,13 @@
       const opt = fishSel.selectedOptions[0];
       const category = opt?.dataset?.category;
 
-      console.log(mutationSel.value);
       const parsed = Number(mutationSel.value);
-      const mutated = Number.isFinite(parsed);
-
-      
+      const mutated = parsed !== 0;
 
       const fishValue = Number(opt?.value);
       const fishCycleTime = rarityCycleTimes[category];
       const starsValue = Number(starsSel.value);
       const mutationValue = mutated ? parsed : 1;
-      console.log(mutated, mutationValue);
       const weightStr = weightInput.value.trim();
       const weightNum = Number(weightStr);
 
