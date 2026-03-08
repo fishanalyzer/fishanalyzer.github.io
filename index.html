@@ -112,14 +112,29 @@
     }
 
     function sanitizeWeight(s){
-      s = s.replace(/[^0-9.]/g,'');
-      const parts = s.split('.');
-      if(parts.length>2) s = parts[0]+'.'+parts.slice(1).join('');
-      if(s.startsWith('.')) s = '0'+s;
-      return s;
+      s = String(s);
+      let out = '';
+      for(let i=0;i<s.length;i++){
+        const ch = s[i];
+        if((ch >= '0' && ch <= '9') || ch === '.') out += ch;
+      }
+      const firstDot = out.indexOf('.');
+      if(firstDot === -1){
+        if(out === '') return '';
+        return out;
+      }
+      let intPart = '';
+      for(let i=0;i<firstDot;i++){
+        if(out[i] !== '.') intPart += out[i];
+      }
+      let frac = '';
+      for(let i=firstDot+1;i<out.length && frac.length < 1;i++){
+        if(out[i] !== '.') frac += out[i];
+      }
+      if(intPart === '') intPart = '0';
+      return intPart + '.' + frac;
     }
-
-    function getNumber(element){
+function getNumber(element){
       const v = Number(element.value);
       return Number.isFinite(v)?v:0;
     }
@@ -148,7 +163,21 @@
       const weightStr = weightInput.value.trim();
       const weightNum = Number(weightStr);
 
-      const weightValid = weightStr.length>0 && /^\d+(?:\.\d+)?$/.test(weightStr);
+      const weightValid = (function(ws){
+        if(ws.length === 0) return false;
+        const firstDot = ws.indexOf('.');
+        if(firstDot === -1){
+          for(let i=0;i<ws.length;i++){ const c = ws.charCodeAt(i); if(c < 48 || c > 57) return false; }
+          return true;
+        }
+        if(firstDot !== ws.lastIndexOf('.')) return false;
+        if(firstDot === 0) return false;
+        if(ws.length - firstDot - 1 > 1) return false;
+        for(let i=0;i<firstDot;i++){ const c = ws.charCodeAt(i); if(c < 48 || c > 57) return false; }
+        for(let i=firstDot+1;i<ws.length;i++){ const c = ws.charCodeAt(i); if(c < 48 || c > 57) return false; }
+        return true;
+      })(weightStr);
+
       if(!weightValid && weightStr.length>0){
         weightInput.classList.add('invalid');
         document.getElementById('weightHint').textContent = 'Invalid weight — use digits and a single dot.';
