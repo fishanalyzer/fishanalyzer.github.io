@@ -177,7 +177,7 @@
 
     function computeSellPrice(fishValue,starsValue,mutationValue,weight){
       if (!Number.isFinite(weight) || weight == 0) {
-        return null;
+        return { lower: null, upper: null};
       } else {
         return { lower: Math.round((weight-0.05) * fishValue * starsValue * mutationValue), upper: Math.round((weight+0.049) * fishValue * starsValue * mutationValue) };
       }
@@ -185,7 +185,7 @@
 
     function computeBoundedMoneyPerHour(lower,upper,cycleTime,mutated,weight){
       if (!Number.isFinite(weight) || weight == 0) {
-        return null;
+        return { lower: null, upper: null};
       } else {
         const lowerMph = computeMoneyPerHour(lower,cycleTime,mutated);
         const upperMph = computeMoneyPerHour(upper,cycleTime,mutated);
