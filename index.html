@@ -254,7 +254,7 @@
         return { lowerMph: null, upperMph: null };
       } else {
         const lowerMph = computeMoneyPerHour(lower, cycleTime, mutated);
-        const upperMph = computeMoneyPerHour(upper, cycleTime, mutated);
+        const upperMph = computeMoneyPerHour(upper+1, cycleTime, mutated);
         return { lowerMph, upperMph };
       }
     }
