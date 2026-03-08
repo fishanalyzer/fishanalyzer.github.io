@@ -47,7 +47,7 @@
     </div>
     <div class="results">
       <div class="stat">
-        <div style="font-size:13px;color:#9fb0d6">Sell price</div>
+        <div style="font-size:13px;color:#9fb0d6">Estimated Sell Price (at kraken)</div>
         <div class="value" id="sellPrice">—</div>
         <div class="meta" id="sellMeta"></div>
       </div>
@@ -161,13 +161,18 @@
       if(intPart === '') intPart = '0';
       return intPart + '.' + frac;
     }
-function getNumber(element){
+
+    function getNumber(element){
       const v = Number(element.value);
       return Number.isFinite(v)?v:0;
     }
 
     function computeSellPrice(fishValue,starsValue,mutationValue,weight){
-      return null;
+      if (!Number.isFinite(weight)) {
+        return null;
+      } else {
+        return `$${Math.round((weight-0.05) * fishValue * starsValue * mutationValue)}—$${Math.round((weight+0.049) * fishValue * starsValue * mutationValue)}`;
+      }
     }
 
     function computeMoneyPerHour(fishValue,starsValue,mutationValue,weight){
@@ -214,7 +219,7 @@ function getNumber(element){
       }
 
       const sell = computeSellPrice(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
-      const money = computeMoneyPerHour(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
+      const money = computeMoneyPerHour(sell,weightValid?weightNum:NaN);
 
       if(typeof sell === 'number' && Number.isFinite(sell)) sellEl.textContent = String(sell);
       else sellEl.textContent = '—';
