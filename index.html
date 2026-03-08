@@ -299,7 +299,7 @@
       if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
       else sellEl.textContent = '—';
 
-      if (opt?.textContent.includes('Head') || opt?.textContent.includes('Meat')) {
+      if (opt?.textContent.includes('☠️')) {
         moneyEl.textContent = 'Only alive fish may be put into the fish pond';
       } else {
         const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,mutated,weightValid?weightNum:NaN);
