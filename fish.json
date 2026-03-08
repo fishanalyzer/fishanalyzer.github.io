@@ -1,0 +1,50 @@
+{
+  "Legendary": {
+    "Ancient Shark": 50,
+    "Bigmouthfish": 76,
+    "Bluefin Tuna": 36,
+    "Eyefish": 160,
+    "Sacabambaspis": 150
+  },
+  "Epic": {
+    "Barracuda": 20,
+    "Cavefish": 22,
+    "Hammer Shark": 48,
+    "Jaguar Shark": 50,
+    "Sailfish": 40,
+    "Shark": 40,
+    "Toucan Fish": 90
+  },
+  "Rare": {
+    "Anglerfish": 35,
+    "Blobfish": 75,
+    "Grouper": 28,
+    "Lionfish": 20,
+    "Mahi Mahi": 8,
+    "Narwhal": 18,
+    "Piranha": 44,
+    "Scorpionfish": 60,
+    "Sea Horse": 250,
+    "Sea Turtle": 20,
+    "Sunfish": 17
+  },
+  "Uncommon": {
+    "Cod": 18,
+    "Blackfin Tuna": 16,
+    "Jellyfish": 35,
+    "Napoleon": 20,
+    "Pufferfish": 13,
+    "Pufferfish (Inflated)": 26,
+    "Salmon": 9,
+    "Tambaqui": 18,
+    "Trout": 24
+  },
+  "Common": {
+    "Blue Tang": 14,
+    "Clownfish": 12,
+    "Discus": 25,
+    "Tang": 12,
+    "Pacific Fanfish": 20,
+    "Pompano": 14
+  }
+}
