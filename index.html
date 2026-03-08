@@ -245,7 +245,7 @@
       if (!Number.isFinite(weight) || weight == 0) {
         return { lower: null, upper: null};
       } else {
-        return { lower: (weight-0.05) * fishValue * starsValue * mutationValue * raceValue, upper: (weight+0.049) * fishValue * starsValue * mutationValue * raceValue * artifact };
+        return { lower: (weight-0.05) * fishValue * starsValue * mutationValue * raceValue * artifact, upper: (weight+0.049) * fishValue * starsValue * mutationValue * raceValue * artifact };
       }
     }
 
