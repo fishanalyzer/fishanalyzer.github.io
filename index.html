@@ -216,10 +216,11 @@
         document.getElementById('weightHint').textContent = 'Invalid weight — use digits and a single dot.';
       } else {
         weightInput.classList.remove('invalid');
-        document.getElementById('weightHint').textContent = 'Use a dot as decimal separator.';
+        document.getElementById('weightHint').textContent = '';
       }
 
       const sell = computeSellPrice(fishValue,starsValue,mutationValue,weightValid?weightNum:NaN);
+      console.log(sell);
       const money = computeMoneyPerHour(sell,weightValid?weightNum:NaN);
 
       if(typeof sell === 'number' && Number.isFinite(sell)) sellEl.textContent = String(sell);
