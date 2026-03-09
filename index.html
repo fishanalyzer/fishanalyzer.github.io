@@ -20,14 +20,10 @@
     html,body{height:100%}
     body{
       display:flex;
-      align-items:flex-start;    /* <-- changed: allow top-of-page to be reachable when content is taller */
+      align-items:flex-start;
       justify-content:center;
-      /* prefer the small viewport so mobile browser chrome doesn't cover the top */
-      min-height: 100svh;        /* modern: small viewport height (keeps top reachable) */
-      min-height: 100dvh;        /* fallback: dynamic viewport height */
-      min-height: 100vh;         /* legacy fallback */
-      
-      /* make in-page / anchor scrolling stop below the top safe area / UI */
+      height: 100dvh;
+      min-height: 100%;
       scroll-padding-top: calc(env(safe-area-inset-top, 0px) + clamp(.5rem,1.5vw,1.25rem));
       margin:0;
       background:#0f172a;
@@ -46,6 +42,7 @@
       display:block;
       container-type:inline-size;
     }
+    .card { margin-top: calc(env(safe-area-inset-top, 0px) + .5rem); }
     h1{margin:0 0 .9rem;font-size:1.25rem}
     .row{display:flex;gap:var(--gutter);margin-bottom:clamp(.5rem,1.2vw,.9rem);align-items:flex-start}
     label{font-size:.85rem;color:#9fb0d6}
