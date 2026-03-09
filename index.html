@@ -22,7 +22,13 @@
       display:flex;
       align-items:flex-start;    /* <-- changed: allow top-of-page to be reachable when content is taller */
       justify-content:center;
-      min-height:100dvh;         /* <-- changed: use vh for consistent scrolling behavior */
+      /* prefer the small viewport so mobile browser chrome doesn't cover the top */
+      min-height: 100svh;        /* modern: small viewport height (keeps top reachable) */
+      min-height: 100dvh;        /* fallback: dynamic viewport height */
+      min-height: 100vh;         /* legacy fallback */
+      
+      /* make in-page / anchor scrolling stop below the top safe area / UI */
+      scroll-padding-top: calc(env(safe-area-inset-top, 0px) + clamp(.5rem,1.5vw,1.25rem));
       margin:0;
       background:#0f172a;
       color:#e6eef8;
