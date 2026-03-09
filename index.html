@@ -99,16 +99,19 @@
       <div class="col">
         <label for="decorationSelect">Decoration Upgrade Level</label>
         <select id="decorationSelect"><option>Loading...</option></select>
-        <div class="hint" id="artifacthint">Can be upgraded at Bobert in the Fish Pond</div>
+        <div class="hint" id="decorationhint">Can be upgraded at Bobert in the Fish Pond</div>
       </div>
-      
     </div>
     <div class="row">
-      
       <div class="col">
         <label for="cashMultiplier">Active Artifacts Cash Bonus (%)*</label>
         <input id="cashMultiplier" inputmode="decimal" placeholder="e.g. 12.8  (leave empty to ignore)">
         <div class="hint" id="artifacthint">Example: The King's Fortune + 2 Coins with Cash VII = 10 + 1.4 + 1.4 = 12.8 (%)</div>
+      </div>
+      <div class="col">
+        <label for="fishfeedSelect">Fish Feed</label>
+        <select id="fishfeedSelect"><option>Loading...</option></select>
+        <div class="hint" id="fishfeedhint">⚠️ Cost is NOT included in Income (Fish Pond)</div>
       </div>
     </div>
     <div class="results">
@@ -136,7 +139,8 @@
       {id:'starsSelect', file:'stars.json'},
       {id:'mutationSelect', file:'mutation.json'},
       {id:'raceSelect', file:'races.json'},
-      {id:'decorationSelect', file:'decorationupgrade.json'} 
+      {id:'decorationSelect', file:'decorationupgrade.json'},
+      {id:'fishfeedSelect', file:'fishfeed.json'}
     ];
 
     const rarityColors = {
@@ -271,18 +275,18 @@
       }
     }
 
-    function computeBoundedMoneyPerHour(lower, upper, cycleTime, decorationUpgrade, mutated, weight) {
+    function computeBoundedMoneyPerHour(lower, upper, cycleTime, decorationUpgrade, fishfeed, mutated, weight) {
       if (!Number.isFinite(weight) || weight == 0) {
         return { lowerMph: null, upperMph: null };
       } else {
-        const lowerMph = computeMoneyPerHour(lower, cycleTime, decorationUpgrade, mutated);
-        const upperMph = computeMoneyPerHour(upper+1, cycleTime, decorationUpgrade, mutated);
+        const lowerMph = computeMoneyPerHour(lower, cycleTime, decorationUpgrade, fishfeed, mutated);
+        const upperMph = computeMoneyPerHour(upper+1, cycleTime, decorationUpgrade, fishfeed, mutated);
         return { lowerMph, upperMph };
       }
     }
 
-    function computeMoneyPerHour(price,cycleTime,decorationUpgrade,mutated) {
-      return Math.round(Math.ceil(price * (mutated ? 0.01 : 0.02)) / (cycleTime / decorationUpgrade) * 60);
+    function computeMoneyPerHour(price,cycleTime,decorationUpgrade,fishfeed,mutated) {
+      return Math.round(Math.ceil(price * (mutated ? 0.01 : 0.02)) / (cycleTime / (decorationUpgrade + fishfeed)) * 60);
     }
 
     function update(){
@@ -296,6 +300,7 @@
       const raceSel = document.getElementById('raceSelect');
       const artifactInput = document.getElementById('cashMultiplier');
       const decorSel = document.getElementById('decorationSelect');
+      const fishfeedSel = document.getElementById('fishfeedSelect');
 
       const opt = fishSel.selectedOptions[0];
       const category = opt?.dataset?.category;
@@ -313,6 +318,7 @@
 
       const raceValue = Number(raceSel.value);
       const decorValue = Number(decorSel.value);
+      const fishfeedValue = Number(fishfeedSel.value);
 
       const artifactStr = artifactInput.value.trim();
       const artifactNum = Number(artifactStr);
@@ -327,7 +333,7 @@
         moneyEl.textContent = 'Only alive fish may be put into the fish pond';
         moneyMeta.textContent = '';
       } else {
-        const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,decorValue,mutated,weightValid?weightNum:NaN);
+        const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,decorValue,fishfeedValue,mutated,weightValid?weightNum:NaN);
         const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
 
         if (lowerMph != null) {
@@ -359,6 +365,7 @@
       document.getElementById('mutationSelect').addEventListener('change',update);
       document.getElementById('raceSelect').addEventListener('change',update);
       document.getElementById('decorationSelect').addEventListener('change',update);
+      document.getElementById('fishfeedSelect').addEventListener('change',update);
       document.getElementById('weightInput').addEventListener('input',e=>{
         const cleaned = sanitizeInput(e.target.value);
         if(cleaned !== e.target.value) e.target.value = cleaned;

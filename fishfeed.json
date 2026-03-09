@@ -1,0 +1,21 @@
+{
+  "Placeholder": {
+    "No Fish Feed": 0
+  },
+  "Legendary": {
+    "Star Feed | 40% | $5,000 | 2 hours": 0.4
+  },
+  "Epic": {
+    "Octopus Feed | 30% | $2,500 | 1 hour": 0.3
+  },
+  "Rare": {
+    "Shrimp Feed | 20% | $1,250 | 45 minutes": 0.2
+  },
+  "Uncommon": {
+    "Worm Feed | 15% | $500 | 30 minutes": 0.15
+  },
+  "Common": {
+    "Fish Feed | 10% | $250 | 20 minutes": 0.1,
+    "Algae Feed | 5% | $100 | 15 minutes": 0.05
+  }
+}
