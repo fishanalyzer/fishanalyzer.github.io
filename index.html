@@ -202,7 +202,7 @@
         }
       }));
       wire();
-      update();
+      document.getElementById('fishSelect').dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
     }
 
     function sanitizeInput(s, oneDigit = true) {
