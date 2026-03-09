@@ -302,7 +302,7 @@
       if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
       else sellEl.textContent = '—';
 
-      if (opt?.textContent.includes('Head') || opt?.textContent.includes('Meat')) {
+      if (opt?.textContent.includes('☠️')) {
         moneyEl.textContent = 'Only alive fish may be put into the fish pond';
         moneyMeta.textContent = '';
       } else {
@@ -320,7 +320,20 @@
     }
 
     function wire(){
-      document.getElementById('fishSelect').addEventListener('change',update);
+      document.getElementById('fishSelect').addEventListener('change', (e) => {
+        const fish = document.getElementById('fishSelect');
+        const stars = document.getElementById('starsSelect');
+        const selectedText = (fish.options && fish.selectedIndex >= 0)
+          ? fish.options[fish.selectedIndex].text
+          : (fish.textContent || '');
+        if (selectedText.includes('☠️')) {
+          if (stars.options && stars.options.length) stars.selectedIndex = 0;
+          stars.disabled = true; stars.setAttribute('aria-disabled','true');
+        } else {
+          stars.disabled = false; stars.removeAttribute('aria-disabled');
+        }
+        if (typeof update === 'function') update();
+      });
       document.getElementById('starsSelect').addEventListener('change',update);
       document.getElementById('mutationSelect').addEventListener('change',update);
       document.getElementById('raceSelect').addEventListener('change',update);
