@@ -280,7 +280,7 @@
     }
 
     function computeMoneyPerHour(price,cycleTime,decorationUpgrade,mutated) {
-      return Math.round(Math.ceil(price * (mutated ? 0.01 : 0.02)) / (cycleTime * decorationUpgrade) * 60);
+      return Math.round(Math.ceil(price * (mutated ? 0.01 : 0.02)) / (cycleTime / decorationUpgrade) * 60);
     }
 
     function update(){
