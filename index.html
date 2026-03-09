@@ -20,13 +20,16 @@
     html,body{height:100%}
     body{
       display:flex;
-      align-items:center;
+      align-items:flex-start;    /* <-- changed: allow top-of-page to be reachable when content is taller */
       justify-content:center;
-      min-height:100dvh;
+      min-height:100vh;         /* <-- changed: use vh for consistent scrolling behavior */
       margin:0;
       background:#0f172a;
       color:#e6eef8;
-      padding:clamp(.5rem,1.5vw,1.25rem);
+      padding-top:clamp(.5rem,1.5vw,1.25rem);   /* ensure some top padding so content isn't flush with viewport */
+      padding-bottom:clamp(.5rem,1.5vw,1.25rem);/* ensure bottom padding for comfortable scrolling */
+      padding-left:clamp(.5rem,1.5vw,1.25rem);
+      padding-right:clamp(.5rem,1.5vw,1.25rem);
     }
     .card{
       width:min(92vw,var(--card-max-width));
@@ -66,6 +69,9 @@
     @media (max-width:420px){
       :root{font-size:14px}
       .card{padding:clamp(.75rem,3vw,1rem)}
+    }
+    @media (min-height:720px){
+      body { align-items:center; } /* centers vertically only when there's plenty of vertical room */
     }
   </style>
 </head>
