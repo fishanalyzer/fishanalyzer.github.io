@@ -388,8 +388,8 @@
       const singleLine = options.singleLine;
 
       let parts = [];
-      if (name || stars) parts.push(`${stars ? '⭐'.repeat(Number(document.getElementById('starsSelect').textContent[0])) : `` }${stars && name ? ' ' : ''}${name ? document.getElementById('fishSelect').textContent : ``}`);
-      if (mutation) parts.push(document.getElementById('mutationSelect').textContent);
+      if (name || stars) parts.push(`${stars ? '⭐'.repeat(Number(document.getElementById('starsSelect').selectedOptions[0].textContent[0])) : `` }${stars && name ? ' ' : ''}${name ? document.getElementById('fishSelect').selectedOptions[0].textContent : ``}`);
+      if (mutation) parts.push(document.getElementById('mutationSelect').selectedOptions[0].textContent);
       if (weight) {
         const weightStr = document.getElementById('weightInput').value.trim();
         const empty = (weightStr === '');
@@ -397,15 +397,15 @@
       }
       if (sell) parts.push(document.getElementById('sellPrice').textContent);
       if (income) parts.push(document.getElementById('moneyHour').textContent);
-      if (race) parts.push(document.getElementById('raceSelect').textContent);
+      if (race) parts.push(document.getElementById('raceSelect').selectedOptions[0].textContent);
       if (artifacts) {
         const artifactStr = document.getElementById('cashMultiplier').value.trim();
         const empty = (artifactStr === '');
         parts.push(`Artifacts: +${empty ? '0' : artifactStr}% Cash`);
       }
-      if (decoration) parts.push(`Decoration ${document.getElementById('decorationSelect').textContent}`);
+      if (decoration) parts.push(`Decoration ${document.getElementById('decorationSelect').selectedOptions[0].textContent}`);
       if (feed) {
-        const feedStr = document.getElementById('fishfeedSelect').textContent.split("|")[0].trim();
+        const feedStr = document.getElementById('fishfeedSelect').selectedOptions[0].textContent.split("|")[0].trim();
         parts.push(feedStr);
       }
 
