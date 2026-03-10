@@ -77,6 +77,76 @@
     @media (min-height:720px){
       body { align-items:center; } /* centers vertically only when there's plenty of vertical room */
     }
+    .copy-row{display:flex;gap:var(--gutter);align-items:center;margin-top:.75rem;position:relative}
+    .copy-btn{
+      padding:.5rem 1rem;
+      min-width:140px;
+      border-radius:10px;
+      border:1px solid #1c2434;
+      background:#0f172a;
+      color:inherit;
+      font-weight:600;
+      cursor:pointer;
+      min-height:2.6rem;
+      display:inline-flex;
+      align-items:center;       /* vertical centering */
+      justify-content:center;   /* horizontal centering of contents */
+      text-align:center;
+      line-height:1;            /* ensures text sits centered vertically */
+      gap:.5rem;
+    }
+    .copy-btn:focus{outline:3px solid rgba(135,160,198,.12);outline-offset:2px}
+    .copy-menu{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:min(360px,92vw);
+      max-height:60vh;
+      overflow:auto;
+      padding:var(--pad);
+      border-radius:12px;
+      background:#0f172a;
+      border:1px solid #1c2434;
+      box-shadow:0 8px 40px rgba(2,6,23,.6);
+      z-index:60;
+    }
+    .copy-menu.hidden{display:none}
+    .copy-menu .group{margin-bottom:.75rem}
+    .copy-menu .group-title{font-weight:1000;font-size:0.9rem;margin-bottom:.4rem}
+    /* non-checkbox labels styling (explicit) */
+    .copy-menu .group-title,
+    .copy-menu .single-line label,
+    .copy-menu .actions .secondary,
+    .copy-menu .actions .primary,
+    .copy-row .copy-btn {
+      font-size:0.9rem;
+      font-weight:600;
+    }
+
+    /* checkbox labels should use the .stat appearance — you will set class="stat" on those label elements */
+    .copy-menu .choices label.stat{display:inline-flex;align-items:center;gap:.55rem;padding:.35rem;border-radius:8px;background:#0f172a;border:1px solid #1c2434;cursor:pointer;color:#bcd1f6}
+    .copy-menu input[type="checkbox"]{width:1rem;height:1rem;flex:0 0 auto}
+    .copy-menu .choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}
+    .copy-menu .single-line{display:flex;align-items:center;gap:.5rem;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed rgba(255,255,255,.02)}
+    .copy-menu .actions{display:flex;gap:.5rem;margin-top:.65rem;justify-content:space-between;align-items:center}
+    .copy-menu .actions .secondary{background:transparent;border:1px solid #1c2434;padding:.45rem .7rem;border-radius:10px;cursor:pointer;color: azure;}
+    .copy-menu .actions .primary{padding:.5rem .85rem;border-radius:10px;border:1px solid #1c2434;background:#0f172a;font-weight:700;cursor:pointer;color: azure;}
+    .copy-menu .group-note{font-size:.78rem;color:#87a0c6;margin-top:.35rem}
+
+    @media (max-width:520px){
+      .copy-menu{
+        position:fixed;
+        left:var(--gutter);
+        right:var(--gutter);
+        top:50%;
+        transform:translateY(-50%);
+        width:auto;
+        max-width:calc(100% - (2 * var(--gutter)));
+      }
+      .copy-menu .choices{grid-template-columns:1fr}
+      .copy-row{justify-content:space-between}
+    }
   </style>
 </head>
 <body>
@@ -135,6 +205,52 @@
         <div class="meta" id="moneyMeta"></div>
       </div>
     </div>
+    <div class="copy-row">
+      <button id="copyToggle" class="copy-btn" aria-haspopup="true" aria-expanded="false">Copy (may not work yet)</button>
+      <div id="copyMenu" class="copy-menu hidden" role="menu" aria-hidden="true">
+        <div class="group">
+          <div class="group-title">Fish info</div>
+          <div class="choices">
+            <label class="stat"><input type="checkbox" data-key="name" checked> Name</label>
+            <label class="stat"><input type="checkbox" data-key="stars" checked> Stars</label>
+            <label class="stat"><input type="checkbox" data-key="mutation" checked> Mutation</label>
+            <label class="stat"><input type="checkbox" data-key="weight" checked> Weight</label>
+            <label class="stat"><input type="checkbox" data-key="sell"> Sell Price</label>
+            <label class="stat"><input type="checkbox" data-key="income" checked> Income</label>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-title">Money boosts</div>
+          <div class="choices">
+            <label class="stat"><input type="checkbox" data-key="race"> Race</label>
+            <label class="stat"><input type="checkbox" data-key="artifacts"> Artifacts</label>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-title">Roe speed boosts</div>
+          <div class="choices">
+            <label class="stat"><input type="checkbox" data-key="decoration"> Decoration Upgrade</label>
+            <label class="stat"><input type="checkbox" data-key="feed"> Fish Feed</label>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-title">Copy Options</div>
+          <div class="choices">
+            <label class="stat"><input type="checkbox" data-key="singleLine"> Single Line</label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="copyCancel" class="secondary">Cancel</button>
+          <div style="margin-left:auto;display:flex;gap:.5rem">
+            <button id="copyToClipboard" class="primary">Copy to clipboard</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <footer role="contentinfo" class="card-footer">
       <small>
         <div>* Race & Artifacts only matter the moment the roe is generated; it won't affect the roe during collection or selling. Roe production is still actively generated when you are online but not at the Fish Pond.</div>
@@ -170,6 +286,138 @@
       Uncommon: 2,
       Common: 1
     };
+
+    const copyToggle = document.getElementById('copyToggle');
+    const copyMenu = document.getElementById('copyMenu');
+    const copyCancel = document.getElementById('copyCancel');
+    const copyBtn = document.getElementById('copyToClipboard');
+
+    function openMenu(){
+      copyMenu.classList.remove('hidden');
+      copyMenu.setAttribute('aria-hidden','false');
+      copyToggle.setAttribute('aria-expanded','true');
+      document.addEventListener('click', outsideClick);
+      document.addEventListener('keydown', onKeyDown);
+    }
+
+    function closeMenu(){
+      copyMenu.classList.add('hidden');
+      copyMenu.setAttribute('aria-hidden','true');
+      copyToggle.setAttribute('aria-expanded','false');
+      document.removeEventListener('click', outsideClick);
+      document.removeEventListener('keydown', onKeyDown);
+    }
+
+    function outsideClick(e){
+      if (!copyMenu.contains(e.target) && e.target !== copyToggle) closeMenu();
+    }
+
+    function onKeyDown(e){
+      if (e.key === 'Escape') closeMenu();
+    }
+
+    copyToggle.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      copyMenu.classList.contains('hidden') ? openMenu() : closeMenu();
+    });
+
+    copyCancel.addEventListener('click', (e)=>{
+      e.preventDefault();
+      closeMenu();
+    });
+
+    function getSelectedCopyOptions(){
+      const checks = Array.from(copyMenu.querySelectorAll('input[type="checkbox"]'));
+      const result = {};
+      checks.forEach(ch=>{
+        const key = ch.id === 'singleLine' ? 'singleLine' : ch.dataset.key;
+        if (!key) return;
+        result[key] = ch.checked;
+      });
+      return result;
+    }
+
+    copyBtn.addEventListener('click', (e)=>{
+      const selectedOptions = getSelectedCopyOptions();
+      const event = new CustomEvent('copy-options', {detail: selectedOptions});
+      window.dispatchEvent(event);
+      if (typeof window.onCopyRequested === 'function'){
+        window.onCopyRequested(selectedOptions);
+      }
+      closeMenu();
+    });
+
+    async function copyToClipboard(text){
+      // modern API (works on https and usually requires user gesture, your click qualifies)
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        return navigator.clipboard.writeText(text);
+      }
+
+      // fallback for older browsers
+      return new Promise((resolve, reject) => {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          // avoid page jump / visible UI
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (ok) resolve();
+          else reject(new Error('execCommand copy failed'));
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    function buildCopyText(options) {
+      const name = options.name;
+      const stars = options.stars;
+      const mutation = options.mutation;
+      const weight = options.weight;
+      const sell = options.sell;
+      const income = options.income;
+      const race = options.race;
+      const artifacts = options.artifacts;
+      const decoration = options.decoration;
+      const feed = options.feed;
+      const singleLine = options.singleLine;
+
+      let parts = [];
+      if (name || stars) parts.push(`${stars ? '⭐'.repeat(Number(document.getElementById('starsSelect').textContent[0])) : `` }${stars && name ? ' ' : ''}${name ? document.getElementById('fishSelect').textContent : ``}`);
+      if (mutation) parts.push(document.getElementById('mutationSelect').textContent);
+      if (weight) {
+        const weightStr = document.getElementById('weightInput').value.trim();
+        const empty = (weightStr === '');
+        parts.push(`${empty ? '0' : weightStr}kg`)
+      }
+      if (sell) parts.push(document.getElementById('sellPrice').textContent);
+      if (income) parts.push(document.getElementById('moneyHour').textContent);
+      if (race) parts.push(document.getElementById('raceSelect').textContent);
+      if (artifacts) {
+        const artifactStr = document.getElementById('cashMultiplier').value.trim();
+        const empty = (artifactStr === '');
+        parts.push(`Artifacts: +${empty ? '0' : artifactStr}% Cash`);
+      }
+      if (decoration) parts.push(`Decoration ${document.getElementById('decorationSelect').textContent}`);
+      if (feed) {
+        const feedStr = document.getElementById('fishfeedSelect').textContent.split("|")[0].trim();
+        parts.push(feedStr);
+      }
+
+      let msg;
+      if (singleLine) {
+        msg = parts.join(' | ');
+      } else {
+        msg = parts.join('\n');
+      }
+
+      return msg;
+    }
 
     function parseOptionsJson(data){
       const out = [];
@@ -396,6 +644,28 @@
         const cleaned = sanitizeInput(e.target.value, false);
         if(cleaned !== e.target.value) e.target.value = cleaned;
         else update();
+      });
+      window.addEventListener('copy-options', async (e) => {
+        // e.detail contains the options object you dispatch (from your click handler)
+        const options = e?.detail ?? getSelectedCopyOptions();
+
+        // Optionally you can access the checkboxes directly here:
+        // const directChecks = Array.from(document.querySelectorAll('#copyMenu input[type="checkbox"]'));
+        // console.log(directChecks.map(c => ({ id: c.id, key: c.dataset.key, checked: c.checked })));
+
+        // build the text and copy
+        const text = buildCopyText(options);
+
+        try {
+          await copyToClipboard(text);
+          // success feedback
+          console.log('Copied to clipboard:', text);
+          // show small UI toast, or set a status message in DOM
+          showToast?.('Copied to clipboard'); // optional helper if you have one
+        } catch (err) {
+          console.error('Copy failed', err);
+          showToast?.('Copy failed — try manually'); // fallback UI
+        }
       });
     }
 
