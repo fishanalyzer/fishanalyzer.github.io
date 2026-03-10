@@ -147,6 +147,41 @@
       .copy-menu .choices{grid-template-columns:1fr}
       .copy-row{justify-content:space-between}
     }
+
+    #toast-container {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10000;
+      pointer-events: none; /* allow clicks to pass through except on the toast itself */
+      max-width: calc(100% - 48px);
+    }
+
+    .toast {
+      pointer-events: auto;
+      background: #0f172a;      /* requested background */
+      color: #ffffff;           /* white text */
+      border: 1px solid #1c2434;/* requested border */
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+      font-size: 14px;
+      line-height: 1.2;
+      max-width: 360px;
+      word-break: break-word;
+      opacity: 0;
+      transform: translateY(10px) scale(.99);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+
+    /* visible state */
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   </style>
 </head>
 <body>
@@ -259,6 +294,7 @@
       </small>
     </footer>
   </div>
+  <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
   <script>
     const files = [
       {id:'fishSelect', file:'fish.json'},
@@ -286,6 +322,41 @@
       Uncommon: 2,
       Common: 1
     };
+
+    function ensureToastContainer() {
+      let c = document.getElementById('toast-container');
+      if (!c) {
+        c = document.createElement('div');
+        c.id = 'toast-container';
+        c.setAttribute('aria-live', 'polite');
+        document.body.appendChild(c);
+      }
+      return c;
+    }
+
+    function showToast(message, { duration = 2000 } = {}) {
+      const container = ensureToastContainer();
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = message;
+      el.setAttribute('role', 'status');
+
+      container.appendChild(el);
+
+      requestAnimationFrame(() => el.classList.add('show'));
+
+      let hideTimeout = setTimeout(hide, duration);
+
+      el.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+      el.addEventListener('mouseleave', () => hideTimeout = setTimeout(hide, 1200));
+
+      function hide() {
+        el.classList.remove('show');
+        el.addEventListener('transitionend', () => el.remove(), { once: true });
+      }
+
+      return { dismiss: hide };
+    }
 
     const copyToggle = document.getElementById('copyToggle');
     const copyMenu = document.getElementById('copyMenu');
@@ -648,23 +719,15 @@
       window.addEventListener('copy-options', async (e) => {
         // e.detail contains the options object you dispatch (from your click handler)
         const options = e?.detail ?? getSelectedCopyOptions();
-
-        // Optionally you can access the checkboxes directly here:
-        // const directChecks = Array.from(document.querySelectorAll('#copyMenu input[type="checkbox"]'));
-        // console.log(directChecks.map(c => ({ id: c.id, key: c.dataset.key, checked: c.checked })));
-
-        // build the text and copy
+        
         const text = buildCopyText(options);
 
         try {
           await copyToClipboard(text);
-          // success feedback
-          console.log('Copied to clipboard:', text);
-          // show small UI toast, or set a status message in DOM
-          showToast?.('Copied to clipboard'); // optional helper if you have one
+          showToast('✅ Copied to clipboard');
         } catch (err) {
           console.error('Copy failed', err);
-          showToast?.('Copy failed — try manually'); // fallback UI
+          showToast('❌ Copy failed');
         }
       });
     }
