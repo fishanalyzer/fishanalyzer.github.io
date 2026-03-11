@@ -675,7 +675,7 @@
         moneyMeta.textContent = '';
       } else {
         const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,decorValue,fishfeedValue,mutated,weightValid?weightNum:NaN);
-        const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
+        const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h or $${upperMph}/h`);
 
         if (lowerMph != null) {
           moneyEl.textContent = msg
