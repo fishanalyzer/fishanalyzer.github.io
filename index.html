@@ -77,6 +77,70 @@
     @media (min-height:720px){
       body { align-items:center; } /* centers vertically only when there's plenty of vertical room */
     }
+
+    /* CSS: add to your stylesheet */
+    /* Namespaced to avoid clashing with other classes */
+    .announcement{
+      /* Card-friendly sizing */
+      padding: clamp(0.6rem, 1.4vw, 0.9rem);
+      border-radius: 10px;
+      /* Subtle translucent surface reminiscent of .stat but not copied verbatim */
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.02) 0%,
+        rgba(255,255,255,0.01) 100%
+      );
+      text-align: center;
+      /* Make it blend with card text color and respect dark/light via currentColor */
+      color: inherit;
+      /* Keep it compact so it fits neatly inside a card */
+      max-width: 100%;
+      box-sizing: border-box;
+      display: block;
+      margin: 0.25rem 0;
+      border: 1px solid rgba(255,255,255,0.03); /* subtle edge for definition */
+    }
+
+    /* Title */
+    .announcement__title{
+      margin: 0 0 0.25rem 0;
+      font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+      font-weight: 600;
+      line-height: 1.15;
+    }
+
+    /* Body text */
+    .announcement__text{
+      margin: 0;
+      font-size: clamp(0.85rem, 1.6vw, 0.95rem);
+      line-height: 1.35;
+      opacity: 0.95;
+    }
+
+    /* Link styling — visible and accessible */
+    .announcement__link{
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+      font-weight: 600;
+    }
+
+    /* Hover & focus for the link: subtle lift without altering layout */
+    .announcement__link:hover,
+    .announcement__link:focus{
+      text-decoration-thickness: 2px;
+      outline: none;
+      /* accessible focus ring */
+      box-shadow: 0 0 0 3px rgba(100,150,255,0.12);
+      border-radius: 4px;
+    }
+
+    /* Optional compact variant if you need an even smaller footprint */
+    .announcement--compact{
+      padding: clamp(0.4rem, 1.0vw, 0.6rem);
+    }
+
     .copy-row{display:flex;gap:var(--gutter);align-items:center;margin-top:.75rem;position:relative}
     .copy-btn{
       padding:.5rem 1rem;
@@ -188,6 +252,14 @@
 <body>
   <div class="card">
     <h1>Abyss Fish Pond Calculator</h1>
+    <section class="announcement" role="note" aria-label="Site announcement">
+      <h3 class="announcement__title">Spreadsheet to keep track of all your fish | ⚠️ YOU HAVE TO MAKE A COPY</h3>
+      <p class="announcement__text">
+        Click 
+        <a class="announcement__link" href="https://docs.google.com/spreadsheets/d/16weN8Aa4VHpUnuk9OSDvJyOm1gc2J_rGMc-IzMs5h4c/edit?usp=sharing" aria-label="Read the full changelog">here</a>
+        to open. More info in discord, #guides -> Fish Pond Roe Spreadsheet Calculator. The spreadsheet should have the same results as this website. Made by @mysthri
+      </p>
+    </section>
     <div class="row">
       <div class="col">
         <label for="fishSelect">Fish</label>
