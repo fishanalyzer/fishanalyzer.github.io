@@ -693,7 +693,7 @@
         return { lowerMph: null, upperMph: null };
       } else {
         const lowerMph = computeMoneyPerHour(lower, cycleTime, decorationUpgrade, fishfeed, mutated);
-        const upperMph = computeMoneyPerHour(upper+1, cycleTime, decorationUpgrade, fishfeed, mutated);
+        const upperMph = computeMoneyPerHour(upper+0.5, cycleTime, decorationUpgrade, fishfeed, mutated);
         return { lowerMph, upperMph };
       }
     }
