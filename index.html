@@ -616,18 +616,33 @@
           const res = await fetch(f.file);
           if(!res.ok) throw new Error('no');
           const json = await res.json();
-          const opts = parseOptionsJson(json);
+          const opts = parseOptionsJson(json) || [];
+    
+          // If we're filling the mutationSelect, sort everything after the first item
+          let useOpts = opts;
+          if (f.id === 'mutationSelect' && opts.length > 1) {
+            const [first, ...rest] = opts;
+            // case-insensitive, numeric-aware alphabetical sort
+            rest.sort((a, b) =>
+              String(a.name).localeCompare(String(b.name), undefined, { sensitivity: 'base', numeric: true })
+            );
+            useOpts = [first, ...rest];
+          }
+    
           const sel = document.getElementById(f.id);
           sel.innerHTML = '';
-          opts.forEach(o => {
+          useOpts.forEach(o => {
             const opt = document.createElement('option');
             opt.textContent = o.name;
             opt.value = String(o.value);
-            if (o.category) {
+    
+            // color only for fishSelect/raceSelect
+            if (f.id === 'fishSelect' || f.id === 'raceSelect') {
               opt.style.color = rarityColors[o.category] || '';
-              if (f.id === 'fishSelect') {
-                opt.dataset.category = o.category;
-              }
+            }
+            // keep category dataset for fishSelect and mutationSelect
+            if (f.id === 'fishSelect' || f.id === 'mutationSelect') {
+              opt.dataset.category = o.category;
             }
             sel.appendChild(opt);
           });
