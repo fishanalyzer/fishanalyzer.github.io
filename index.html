@@ -782,10 +782,13 @@
         moneyEl.textContent = 'Only alive fish may be put into the fish pond';
         moneyMeta.textContent = '';
       } else {
+
+        console.log("price: ", lowerSellPrice, upperSellPrice);
+
         const lowerMph = computeMoneyPerHour(lowerSellPrice,fishCycleTime,decorValue,fishfeedValue,mutated);
         const upperMph = computeMoneyPerHour(upperSellPrice,fishCycleTime,decorValue,fishfeedValue,mutated);
 
-        console.log(lowerMph, upperMph);
+        console.log("money/h: ", lowerMph, upperMph);
 
         const mphMsg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
 
