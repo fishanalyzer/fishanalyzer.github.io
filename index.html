@@ -716,8 +716,15 @@
       return lower <= upper ? { lower, upper } : { lower: null, upper: null };
     }
 
-    function computeMoneyPerHour(price,cycleTime,decorationUpgrade,fishfeed,mutated) {
-      return Math.round(Math.ceil((price + 1) * (mutated ? 0.01 : 0.02)) / (cycleTime / (decorationUpgrade + fishfeed)) * 60);
+    function computeMoneyPerHour(price, cycleTime, decorationUpgrade, fishfeed, mutated) {
+      console.log('computeMoneyPerHour inputs:', { price, cycleTime, decorationUpgrade, fishfeed, mutated, typeofMutated: typeof mutated });
+      const rate = mutated ? 0.01 : 0.02;
+      const raw = (price + 1) * rate;
+      const perCycle = Math.ceil(raw);
+      const cyclesPerMin = (decorationUpgrade + fishfeed) / cycleTime;
+      const perHour = perCycle * cyclesPerMin * 60;
+      console.log({ rate, raw, perCycle, cyclesPerMin, perHour });
+      return Math.round(perHour);
     }
 
     function update(){
