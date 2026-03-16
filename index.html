@@ -776,6 +776,9 @@
         sellEl.textContent = sellMsg;
       } else {
         sellEl.textContent = "Impossible Weight Selected";
+        moneyMeta.textContent = '';
+        moneyEl.textContent = '—';
+        break;
       }
 
       if (opt?.textContent.includes('☠️')) {
