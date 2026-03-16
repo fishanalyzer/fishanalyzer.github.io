@@ -716,8 +716,10 @@
       return lower <= upper ? { lower, upper } : { lower: null, upper: null };
     }
 
-    function computeMoneyPerHour(price,cycleTime,decorationUpgrade,fishfeed,mutated) {
-      return Math.round(Math.ceil((price + 1) * (mutated ? 0.01 : 0.02)) * (decorationUpgrade + fishfeed) * 60 / cycleTime );
+    function computeMoneyPerHour(price, cycleTime, decorationUpgrade, fishfeed, mutated) {
+      const base = Math.ceil((price + 1) * (mutated ? 0.01 : 0.02));
+      const raw  = base * (decorationUpgrade + fishfeed) * 60 / cycleTime;
+      return Math.round(raw + 1e-9); // small bump to avoid .4999999
     }
 
     function update(){
