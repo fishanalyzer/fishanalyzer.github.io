@@ -696,25 +696,28 @@
 
     function computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weight,artifact){
       if (!Number.isFinite(weight) || weight == 0) {
-        return { lower: null, upper: null};
+        return null;
       } else {
-        const multi = fishValue * starsValue * mutationValue * raceValue * artifact;
-        return { lower: (weight-0.05) * multi, upper: (weight+0.049) * multi };
+        return Math.round(weight * fishValue * starsValue * mutationValue * raceValue * artifact);
       }
     }
 
-    function computeBoundedMoneyPerHour(lower, upper, cycleTime, decorationUpgrade, fishfeed, mutated, weight) {
-      if (!Number.isFinite(weight) || weight == 0) {
-        return { lowerMph: null, upperMph: null };
-      } else {
-        const lowerMph = computeMoneyPerHour(lower, cycleTime, decorationUpgrade, fishfeed, mutated);
-        const upperMph = computeMoneyPerHour(upper+0.5, cycleTime, decorationUpgrade, fishfeed, mutated);
-        return { lowerMph, upperMph };
+    function getTrueWeight(evilmulti, fakeweight) {
+      if (!Number.isFinite(fakeweight) || !Number.isFinite(evilmulti) || evilmulti === 0) {
+        return { lower: null, upper: null };
       }
+
+      const trueMin = (fakeweight - 0.05) / evilmulti;
+      const trueMax = (fakeweight + 0.05) / evilmulti;
+
+      const lower = Math.ceil(trueMin * 10) / 10 * evilmulti;
+      const upper = (Math.ceil(trueMax * 10) - 1) / 10 * evilmulti;
+
+      return lower <= upper ? { lower, upper } : { lower: null, upper: null };
     }
 
     function computeMoneyPerHour(price,cycleTime,decorationUpgrade,fishfeed,mutated) {
-      return Math.round(Math.ceil(price * (mutated ? 0.01 : 0.02)) / (cycleTime / (decorationUpgrade + fishfeed)) * 60);
+      return Math.round(Math.ceil((price + 1) * (mutated ? 0.01 : 0.02)) / (cycleTime / (decorationUpgrade + fishfeed)) * 60);
     }
 
     function update(){
@@ -732,6 +735,9 @@
 
       const opt = fishSel.selectedOptions[0];
       const category = opt?.dataset?.category;
+
+      const opt2 = mutationSel.selectedOptions[0];
+      const evilmutationweightmulti = Number(opt2?.dataset?.category);
 
       const parsed = Number(mutationSel.value);
       const mutated = parsed !== 0;
@@ -752,25 +758,34 @@
       const artifactNum = Number(artifactStr);
       const artifactValid = (artifactStr.length !== 0);
 
-      const { lower, upper } = computeSellPrice(fishValue,starsValue,mutationValue,raceValue,weightValid?weightNum:NaN,1+(artifactValid?artifactNum:0)/100);
+      if (!weightValid) {
+        sellEl.textContent = '—';
+        moneyMeta.textContent = '';
+        moneyEl.textContent = '—';
+        return;
+      }
 
-      if(lower != null) sellEl.textContent = `$${Math.round(lower)}—$${Math.round(upper)}`;
-      else sellEl.textContent = '—';
+      const { lower: lowerWeight, upper: upperWeight } = evilmutationweightmulti !== 1 ? getTrueWeight(evilmutationweightmulti, weightNum) : { lower: weightNum, upper: weightNum };
+
+      const lowerSellPrice = computeSellPrice(fishValue, starsValue, mutationValue, raceValue, lowerWeight, 1+(artifactValid?artifactNum:0)/100);
+      const upperSellPrice = computeSellPrice(fishValue, starsValue, mutationValue, raceValue, upperWeight, 1+(artifactValid?artifactNum:0)/100);
+
+      const sellMsg = (lowerSellPrice === upperSellPrice ? `$${lowerSellPrice}` : `$${lowerSellPrice}—$${upperSellPrice}`);
+
+      sellEl.textContent = sellMsg;
 
       if (opt?.textContent.includes('☠️')) {
         moneyEl.textContent = 'Only alive fish may be put into the fish pond';
         moneyMeta.textContent = '';
       } else {
-        const { lowerMph, upperMph } = computeBoundedMoneyPerHour(lower,upper,fishCycleTime,decorValue,fishfeedValue,mutated,weightValid?weightNum:NaN);
-        const msg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
+        const lowerMph = computeMoneyPerHour(lowerSellPrice,fishCycleTime,decorValue,fishfeedValue,mutated);
+        const upperMph = computeMoneyPerHour(upperSellPrice,fishCycleTime,decorValue,fishfeedValue,mutated);
 
-        if (lowerMph != null) {
-          moneyEl.textContent = msg
-          moneyMeta.textContent = '⚠️ only half when offline!';
-        } else {
-          moneyEl.textContent = '—';
-          moneyMeta.textContent = '';
-        }
+        const mphMsg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
+
+        moneyEl.textContent = mphMsg;
+        moneyMeta.textContent = '⚠️ only half when offline!';
+        
       }
     }
 
