@@ -772,7 +772,11 @@
 
       const sellMsg = (lowerSellPrice === upperSellPrice ? `$${lowerSellPrice}` : `$${lowerSellPrice}—$${upperSellPrice}`);
 
-      sellEl.textContent = sellMsg;
+      if (lowerSellPrice !== null) {
+        sellEl.textContent = sellMsg;
+      } else {
+        sellEl.textContent = "Impossible Weight Selected";
+      }
 
       if (opt?.textContent.includes('☠️')) {
         moneyEl.textContent = 'Only alive fish may be put into the fish pond';
@@ -780,6 +784,8 @@
       } else {
         const lowerMph = computeMoneyPerHour(lowerSellPrice,fishCycleTime,decorValue,fishfeedValue,mutated);
         const upperMph = computeMoneyPerHour(upperSellPrice,fishCycleTime,decorValue,fishfeedValue,mutated);
+
+        console.log(lowerMph, upperMph);
 
         const mphMsg = (lowerMph === upperMph ? `$${lowerMph}/h` : `$${lowerMph}/h—$${upperMph}/h`);
 
