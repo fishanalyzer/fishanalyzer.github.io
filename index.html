@@ -711,7 +711,7 @@
       const trueMax = (fakeweight + 0.05) / evilmulti;
 
       const lower = Math.ceil(trueMin * 10) / 10 * evilmulti;
-      const upper = (Math.ceil(trueMax * 10) - 1) / 10 * evilmulti;
+      const upper = Math.floor(trueMax * 10) / 10 * evilmulti;
 
       return lower <= upper ? { lower, upper } : { lower: null, upper: null };
     }
