@@ -14,23 +14,30 @@
     "Eyefish": 160,
     "☠️ Mosasaurus Head": 90,
     "☠️ Mosasaurus Meat": 45,
+    "☠️ Orca Head": 126,
+    "☠️ Orca Meat": 63,
     "Sacabambaspis": 150,
     "☠️ Whale Head": 80,
     "☠️ Whale Meat": 40
   },
   "Epic": {
+    "Alien": 140,
     "Barracuda": 20,
+    "Basking Shark": 170,
     "Cavefish": 22,
     "Hammer Shark": 48,
     "Jaguar Shark": 50,
+    "Manta Ray": 48,
     "Sailfish": 40,
     "Shark": 40,
+    "Thresher Shark": 82,
     "Toucan Fish": 90
   },
   "Rare": {
     "Anglerfish": 35,
     "Blobfish": 75,
     "Grouper": 28,
+    "Largemouth Bass": 65,
     "Lionfish": 20,
     "Mahi Mahi": 8,
     "Narwhal": 18,
@@ -38,9 +45,13 @@
     "Scorpionfish": 60,
     "Sea Horse": 250,
     "Sea Turtle": 20,
-    "Sunfish": 17
+    "Sockeye Salmon": 100,
+    "Sunfish": 17,
+    "Surubim": 68
   },
   "Uncommon": {
+    "Atlantic Octopus": 60,
+    "Catfish": 32,
     "Cod": 18,
     "Blackfin Tuna": 16,
     "Jellyfish": 35,
@@ -48,13 +59,16 @@
     "Pufferfish": 13,
     "Pufferfish (Inflated)": 26,
     "Salmon": 9,
+    "Squid": 65,
     "Tambaqui": 18,
     "Trout": 24
   },
   "Common": {
     "Blue Tang": 14,
+    "Boxfish": 32,
     "Clownfish": 12,
     "Discus": 25,
+    "Stingray": 35,
     "Tang": 12,
     "Pacific Fanfish": 20,
     "Pompano": 14
