@@ -768,7 +768,7 @@
         return;
       }
 
-      const { lower: lowerWeight, upper: upperWeight } = evilmutationweightmulti !== 1 ? getTrueWeight(evilmutationweightmulti, weightNum) : { lower: weightNum, upper: weightNum };
+      const { lower: lowerWeight, upper: upperWeight } = evilmutationweightmulti !== 1 ? { lower: weightNum-0.05, upper: weightNum+0.05 } : { lower: weightNum, upper: weightNum };
 
       const lowerSellPrice = computeSellPrice(fishValue, starsValue, mutationValue, raceValue, lowerWeight, 1+(artifactValid?artifactNum:0)/100);
       const upperSellPrice = computeSellPrice(fishValue, starsValue, mutationValue, raceValue, upperWeight, 1+(artifactValid?artifactNum:0)/100);
